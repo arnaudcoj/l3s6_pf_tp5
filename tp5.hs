@@ -48,3 +48,8 @@ exprP = varP
 exprsP :: Parser Expression
 exprsP = (unOuPlus exprP >>= \s ->
            return (applique s))
+         
+--Q6
+
+lambdaP :: Parser Expression
+lambdaP = 
