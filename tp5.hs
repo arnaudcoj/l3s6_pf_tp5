@@ -25,7 +25,7 @@ isMin :: Char -> Bool
 isMin = flip elem ['a'..'z']
 
 nomP :: Parser Nom
-nomP = (unOuPlus(carCond isMin) >>= \s ->
+nomP = (unOuPlus (carCond isMin) >>= \s ->
          espacesP >>= \_ ->
          return s) ||| echoue
        
@@ -46,4 +46,5 @@ exprP :: Parser Expression
 exprP = varP         
 
 exprsP :: Parser Expression
-exprsP = 
+exprsP = (unOuPlus exprP >>= \s ->
+           return (applique s))
