@@ -43,7 +43,7 @@ applique (e:es) = foldl (\x y -> App x y) e es
 --Q5
 
 exprP :: Parser Expression
-exprP = varP         
+exprP = varP ||| lambdaP ||| exprParentheseeP         
 
 exprsP :: Parser Expression
 exprsP = (unOuPlus exprP >>= \s ->
@@ -51,5 +51,30 @@ exprsP = (unOuPlus exprP >>= \s ->
          
 --Q6
 
+flecheP :: Parser ()
+flecheP = (car '-' >>= \_ ->
+           car '>' >>= \s ->
+           espacesP >>= \_ ->
+           return ()) ||| echoue
+
 lambdaP :: Parser Expression
-lambdaP = 
+lambdaP = (car '\\' >>= \_ ->
+           espacesP >>= \_ ->
+           nomP >>= \p ->
+           flecheP >>= \_ ->
+           exprsP >>= \s -> 
+           return (Lam p s)) ||| echoue
+
+--Q7 voir Q5
+
+--Q8
+
+exprParentheseeP :: Parser Expression
+exprParentheseeP = (car '(' >>= \_  ->
+                    espacesP >>= \_ ->
+                    unOuPlus exprP >>= \e ->
+                    car ')' >>= \_ ->
+                    espacesP >>= \_ ->
+                    return (applique e)
+                   )
+             
