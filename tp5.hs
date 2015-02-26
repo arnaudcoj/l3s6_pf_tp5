@@ -24,8 +24,11 @@ espacesP = (car ' ' >>= \_ ->
 isMin :: Char -> Bool
 isMin = flip elem ['a'..'z']
 
+minP :: Parser [Char]
+minP = unOuPlus (carCond isMin)
+
 nomP :: Parser Nom
-nomP = (unOuPlus (carCond isMin) >>= \s ->
+nomP = ( minP >>= \s ->
          espacesP >>= \_ ->
          return s) ||| echoue
        
@@ -43,7 +46,7 @@ applique (e:es) = foldl (\x y -> App x y) e es
 --Q5
 
 exprP :: Parser Expression
-exprP = varP ||| lambdaP ||| exprParentheseeP         
+exprP = booleenP ||| nombreP ||| varP ||| lambdaP ||| exprParentheseeP         
 
 exprsP :: Parser Expression
 exprsP = (unOuPlus exprP >>= \s ->
@@ -78,3 +81,29 @@ exprParentheseeP = (car '(' >>= \_  ->
                     return (applique e)
                    )
              
+--Q9
+
+isChiffre :: Char -> Bool
+isChiffre = flip elem ['1'..'9']
+
+nombreP :: Parser Expression
+nombreP = ( unOuPlus (carCond isChiffre) >>= \n ->
+            espacesP >>= \_ ->
+            return (Lit (Entier (read n))))
+
+--Q10
+
+booleenP :: Parser Expression
+booleenP = (chaine "True" >>= \_ ->
+            espacesP >>= \_ ->
+            return (Lit (Bool True))) |||
+           (chaine "False" >>= \_ ->
+            espacesP >>= \_ ->
+            return (Lit (Bool False)))
+
+--Q11
+
+expressionP :: Parser Expression
+expressionP = (espacesP >>= \_ ->
+               exprsP >>= \r ->
+               return r)
