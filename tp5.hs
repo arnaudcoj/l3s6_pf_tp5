@@ -1,3 +1,5 @@
+--PREMIERE PARTIE
+
 import Parser
 
 type Nom = String
@@ -108,13 +110,19 @@ expressionP = (espacesP >>= \_ ->
                exprsP >>= \r ->
                return r)
 
+--SECONDE PARTIE
 --Q12
 
 getExp Nothing = error "error parse"
-getExp (Just (exp,"")) = exp
+getExp (Just (e,"")) = e
 getExp _ = error "error parse"
 
 ras :: String -> Expression
-ras s = exp
-  where exp = getExp (parse expressionP s)
+ras s = e
+  where e = getExp (parse expressionP s)
         
+--Q13
+
+data ValeurA = VLitteralA Litteral
+             | VFonctionA (ValeurA -> ValeurA)
+
