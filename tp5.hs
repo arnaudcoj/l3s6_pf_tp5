@@ -122,7 +122,20 @@ ras s = e
   where e = getExp (parse expressionP s)
         
 --Q13
-
+                            
 data ValeurA = VLitteralA Litteral
-             | VFonctionA (ValeurA -> ValeurA)
+             | VFonctionA (ValeurA -> ValeurA) 
 
+--Q14
+
+instance Show ValeurA where
+    show (VFonctionA _) = "λ"    
+    show (VLitteralA (Entier i)) = show i
+    show (VLitteralA (Bool b)) = show b
+
+type Environnement a = [(Nom, a)]
+    
+--Q15
+
+interpreteA :: Environnement ValeurA -> Expression -> ValeurA
+interpreteA [] 
