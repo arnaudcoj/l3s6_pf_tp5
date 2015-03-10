@@ -107,3 +107,14 @@ expressionP :: Parser Expression
 expressionP = (espacesP >>= \_ ->
                exprsP >>= \r ->
                return r)
+
+--Q12
+
+getExp Nothing = error "error parse"
+getExp (Just (exp,"")) = exp
+getExp _ = error "error parse"
+
+ras :: String -> Expression
+ras s = exp
+  where exp = getExp (parse expressionP s)
+        
