@@ -1,6 +1,7 @@
 --PREMIERE PARTIE
 
 import Parser
+import Data.Maybe
 
 type Nom = String
 
@@ -63,7 +64,7 @@ flecheP = (car '-' >>= \_ ->
            return ()) ||| echoue
 
 lambdaP :: Parser Expression
-lambdaP = (car '\\' >>= \_ ->
+lambdaP = (car 'λ' >>= \_ ->
            espacesP >>= \_ ->
            nomP >>= \p ->
            flecheP >>= \_ ->
@@ -138,4 +139,38 @@ type Environnement a = [(Nom, a)]
 --Q15
 
 interpreteA :: Environnement ValeurA -> Expression -> ValeurA
-interpreteA [] 
+interpreteA _ (Lit l) = VLitteralA l
+interpreteA xs (Var k) = fromJust (lookup k xs)
+interpreteA xs (Lam nom expr) = VFonctionA (\v -> interpreteA ((nom,v):xs) expr)
+interpreteA xs (App e1 e2) = f v2
+  where VFonctionA f = interpreteA xs e1
+        v2 = interpreteA xs e2
+
+--Q16
+
+negA :: ValeurA
+negA = VFonctionA (\(VLitteralA (Entier n)) -> (VLitteralA (Entier (-n))))
+
+--Q17
+
+addA :: ValeurA
+addA = VFonctionA (\(VLitteralA (Entier n1)) -> VFonctionA (\(VLitteralA (Entier n2)) -> VLitteralA (Entier (n1 + n2))))
+
+--Q18
+
+releveBinOpEntierA :: (Integer -> Integer -> Integer) -> ValeurA 
+releveBinOpEntierA op = VFonctionA (\(VLitteralA (Entier n1)) -> VFonctionA (\(VLitteralA (Entier n2)) -> VLitteralA (Entier (n1 `op` n2))))
+
+
+envA :: Environnement ValeurA
+envA = [ ("neg",   negA)
+       , ("add",   releveBinOpEntierA (+))
+       , ("soust", releveBinOpEntierA (-))
+       , ("mult",  releveBinOpEntierA (*))
+       , ("quot",  releveBinOpEntierA quot) ]
+       
+--Q19
+--Pas fini
+ifthenelseA :: ValeurA
+ifthenelseA = VFonctionA (\(VLitteralA (Bool True)) -> VFonctionA (\(VLitteralA (Entier n1))-> VFonctionA (\(VLitteralA (Entier n2)) -> VLitteralA (Entier n1))))
+ifthenelseA = VFonctionA (\(VLitteralA (Bool False)) -> VFonctionA (\(VLitteralA (Entier n1))-> VFonctionA (\(VLitteralA (Entier n2)) -> VLitteralA (Entier n2))))
