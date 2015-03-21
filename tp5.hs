@@ -270,5 +270,32 @@ interpreteC xs (App e1 e2) = ((s1 ++ s2 ++ "." ++ sr), vr)
         (s2, v2) = interpreteC xs e2
         (sr, vr) = f v2
 
+--Q27
+
 pingC :: ValeurC
 pingC = VFonctionC (\v -> ("p", v))
+
+--Interprete Monadique
+
+--Q28
+
+data ValeurM m = VLitteralM Litteral
+               | VFonctionM (ValeurM m -> m (ValeurM m))
+                 
+instance Show (ValeurM m) where
+  show (VFonctionM _) = "λ"
+  show (VLitteralM (Entier i)) = show i
+  show (VLitteralM (Bool b)) = show b
+
+--Q29
+  
+data SimpleM v = S v
+               deriving Show
+
+interpreteSimpleM :: Environnement (ValeurM SimpleM) -> Expression -> SimpleM (ValeurM SimpleM)
+interpreteSimpleM _ (Lit l) = S (VLitteralM l)
+interpreteSimpleM xs (Var k) = S (fromJust (lookup k xs))
+interpreteSimpleM xs (Lam nom expr) = S (VFonctionM (\v -> interpreteSimpleM ((nom,v):xs) expr))
+interpreteSimpleM xs (App e1 e2) = f v2
+  where S (VFonctionM f) = interpreteSimpleM xs e1
+        S v2 = interpreteSimpleM xs e2
