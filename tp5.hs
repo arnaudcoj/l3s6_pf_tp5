@@ -2,6 +2,7 @@
 
 import Parser
 import Data.Maybe
+import System.IO
 
 type Nom = String
 
@@ -64,7 +65,7 @@ flecheP = (car '-' >>= \_ ->
            return ()) ||| echoue
 
 lambdaP :: Parser Expression
-lambdaP = (car 'λ' >>= \_ ->
+lambdaP = (carCond (\x -> x=='λ' || x=='\\') >>= \_ ->
            espacesP >>= \_ ->
            nomP >>= \p ->
            flecheP >>= \_ ->
@@ -177,6 +178,16 @@ ifthenelseA = VFonctionA (\(VLitteralA (Bool b)) -> VFonctionA (\(VLitteralA (En
                                            (VLitteralA (Entier n1)) 
                                          else (VLitteralA (Entier n2)))))
 
+--Q20
+
+main :: IO ()
+main = (putStr "wesh>" >>= \_ ->
+         hFlush stdout >>= \_ ->
+         getLine >>= \l ->
+         putStr (show (interpreteA [] (ras l))))
+       --TODO
+
+--Interpreteur avec Erreurs
 
 data ValeurB = VLitteralB Litteral
              | VFonctionB (ValeurB -> ErrValB)
