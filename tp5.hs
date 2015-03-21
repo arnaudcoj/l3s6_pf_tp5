@@ -181,10 +181,15 @@ ifthenelseA = VFonctionA (\(VLitteralA (Bool b)) -> VFonctionA (\(VLitteralA (En
 --Q20
 
 main :: IO ()
-main = (putStr "wesh>" >>= \_ ->
-         hFlush stdout >>= \_ ->
-         getLine >>= \l ->
-         putStr (show (interpreteA [] (ras l))))
+main = ( putStr "minilang>" >>= \_ ->
+          hFlush stdout >>= \_ ->
+          isEOF >>= \b ->
+          if b then
+            putStr "see you later !\n"
+          else
+            getLine >>= \l ->
+            putStr (show (interpreteA envA (ras l)) ++ "\n") >>= \_ ->
+            main)
        --TODO
 
 --Interpreteur avec Erreurs
