@@ -226,25 +226,33 @@ quotB = VFonctionB f
                                    h (VLitteralB (Bool b))    = Left (show b ++ " n'est pas un entier")
                                    h (VFonctionB _)           = Left ("λ n'est pas un entier")
             f (VLitteralB (Bool b))    = Left (show b ++ " n'est pas un entier")
-            f (VFonctionB _)           = Left ("λ n'est pas un entier")       
+            f (VFonctionB _)           = Left ("λ n'est pas un entier")
 
+--Interprete traçant
 
+data ValeurC = VLitteralC Litteral
+             | VFonctionC (ValeurC -> OutValC)
 
+type Trace   = String
+type OutValC = (Trace, ValeurC)
 
+--Q25
 
+instance Show ValeurC where
+    show (VFonctionC _) = "λ"    
+    show (VLitteralC (Entier i)) = show i
+    show (VLitteralC (Bool b)) = show b
 
+--Q26
+    
+interpreteC :: Environnement ValeurC -> Expression -> OutValC
+interpreteC _ (Lit l) = ("", VLitteralC l)
+interpreteC xs (Var k) = ("", fromJust (lookup k xs))
+interpreteC xs (Lam nom expr) = ("", VFonctionC (\v -> interpreteC ((nom,v):xs) expr))
+interpreteC xs (App e1 e2) = ((s1 ++ s2 ++ "." ++ sr), vr)
+  where (s1, VFonctionC f) = interpreteC xs e1
+        (s2, v2) = interpreteC xs e2
+        (sr, vr) = f v2
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+pingC :: ValeurC
+pingC = VFonctionC (\v -> ("p", v))
