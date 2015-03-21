@@ -178,10 +178,6 @@ ifthenelseA = VFonctionA (\(VLitteralA (Bool b)) -> VFonctionA (\(VLitteralA (En
                                          else (VLitteralA (Entier n2)))))
 
 
-
-interpreteB :: Environnement ValeurB -> Expression -> Maybe ValeurB
-
-
 data ValeurB = VLitteralB Litteral
              | VFonctionB (ValeurB -> ErrValB)
 
@@ -191,14 +187,46 @@ type ErrValB   = Either MsgErreur ValeurB
 --Q21
 
 instance Show ValeurB where
-    show (VFonctionB _) = "λ"   
+    show (VFonctionB _) = "λ"
     show (VLitteralB (Entier i)) = show i
     show (VLitteralB (Bool b)) = show b
-	show (VLitteralB _) = "Application d'un litteral a quelque chose"
+    
+--Q22
 
+interpreteB :: Environnement ValeurB -> Expression -> ErrValB
+interpreteB _   (Lit l)     = Right (VLitteralB l)
+interpreteB env (Var n)     =  let j = lookup n env
+                               in case isJust j of  True  -> Right (fromJust j)
+                                                    False -> Left ("variable "++ n ++" non definie")
+interpreteB env (Lam n e)   = Right (VFonctionB f)
+                where f v = interpreteB ((n,v) : env) e                                                   
+interpreteB env (App e1 e2) = case interpreteB env e1 of
+                                Right (VFonctionB f) -> case interpreteB env e2 of  Right r -> f r
+                                                                                    Left  m -> Left m
+                                Right (VLitteralB (Entier n)) -> Left (show n ++ " n'est pas une fonction, application impossible")
+                                Right (VLitteralB (Bool b))   -> Left (show b ++ " n'est pas une fonction, application impossible")
+                                Left  m              -> Left m
 
-
-
+--Q23
+addB :: ValeurB
+addB = VFonctionB f
+    where   f (VLitteralB (Entier n1)) = Right (VFonctionB h)
+                            where  h (VLitteralB (Entier n2)) = Right (VLitteralB (Entier (n1 + n2)))
+                                   h (VLitteralB (Bool b))    = Left (show b ++ " n'est pas un entier")
+                                   h (VFonctionB _)           = Left ("λ n'est pas un entier")
+            f (VLitteralB (Bool b))    = Left (show b ++ " n'est pas un entier")
+            f (VFonctionB _)           = Left ("λ n'est pas un entier")
+                
+--Q24
+quotB :: ValeurB                
+quotB = VFonctionB f
+    where   f (VLitteralB (Entier n1)) = Right (VFonctionB h)
+                            where  h (VLitteralB (Entier 0))  = Left "division par zero"
+                                   h (VLitteralB (Entier n2)) = Right (VLitteralB (Entier (quot n1 n2)))
+                                   h (VLitteralB (Bool b))    = Left (show b ++ " n'est pas un entier")
+                                   h (VFonctionB _)           = Left ("λ n'est pas un entier")
+            f (VLitteralB (Bool b))    = Left (show b ++ " n'est pas un entier")
+            f (VFonctionB _)           = Left ("λ n'est pas un entier")       
 
 
 
