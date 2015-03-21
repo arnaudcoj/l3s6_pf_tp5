@@ -167,10 +167,39 @@ envA = [ ("neg",   negA)
        , ("add",   releveBinOpEntierA (+))
        , ("soust", releveBinOpEntierA (-))
        , ("mult",  releveBinOpEntierA (*))
-       , ("quot",  releveBinOpEntierA quot) ]
+       , ("quot",  releveBinOpEntierA quot)
+       , ("if", ifthenelseA)]
        
 --Q19
---Pas fini
 ifthenelseA :: ValeurA
-ifthenelseA = VFonctionA (\(VLitteralA (Bool True)) -> VFonctionA (\(VLitteralA (Entier n1))-> VFonctionA (\(VLitteralA (Entier n2)) -> VLitteralA (Entier n1))))
-ifthenelseA = VFonctionA (\(VLitteralA (Bool False)) -> VFonctionA (\(VLitteralA (Entier n1))-> VFonctionA (\(VLitteralA (Entier n2)) -> VLitteralA (Entier n2))))
+ifthenelseA = VFonctionA (\(VLitteralA (Bool b)) -> VFonctionA (\(VLitteralA (Entier n1))-> VFonctionA (\(VLitteralA (Entier n2)) -> if b then VLitteralA (Entier n1) else VLitteralA (Entier n2))))
+
+
+--Interprete traçant
+
+data ValeurC = VLitteralC Litteral
+             | VFonctionC (ValeurC -> OutValC)
+
+type Trace   = String
+type OutValC = (Trace, ValeurC)
+
+--Q25
+
+instance Show ValeurC where
+    show (VFonctionC _) = "λ"    
+    show (VLitteralC (Entier i)) = show i
+    show (VLitteralC (Bool b)) = show b
+
+--Q26
+    
+interpreteC :: Environnement ValeurC -> Expression -> OutValC
+interpreteC _ (Lit l) = ("", VLitteralC l)
+interpreteC xs (Var k) = ("", fromJust (lookup k xs))
+interpreteC xs (Lam nom expr) = ("", VFonctionC (\v -> interpreteC ((nom,v):xs) expr))
+interpreteC xs (App e1 e2) = ((s1 ++ s2 ++ "." ++ sr), vr)
+  where (s1, VFonctionC f) = interpreteC xs e1
+        (s2, v2) = interpreteC xs e2
+        (sr, vr) = f v2
+
+pingC :: ValeurC
+pingC = VFonctionC (\v -> ("p", v))
