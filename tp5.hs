@@ -8,7 +8,7 @@ type Nom = String
 data Expression = Lam Nom Expression
                 | App Expression Expression
                 | Var Nom
-                | Lit Litteral
+         	       | Lit Litteral
                 deriving (Show,Eq)
 
 data Litteral = Entier Integer
@@ -167,10 +167,56 @@ envA = [ ("neg",   negA)
        , ("add",   releveBinOpEntierA (+))
        , ("soust", releveBinOpEntierA (-))
        , ("mult",  releveBinOpEntierA (*))
-       , ("quot",  releveBinOpEntierA quot) ]
+       , ("quot",  releveBinOpEntierA quot)
+       , ("if",    ifthenelseA )	]
        
 --Q19
---Pas fini
+ 
 ifthenelseA :: ValeurA
-ifthenelseA = VFonctionA (\(VLitteralA (Bool True)) -> VFonctionA (\(VLitteralA (Entier n1))-> VFonctionA (\(VLitteralA (Entier n2)) -> VLitteralA (Entier n1))))
-ifthenelseA = VFonctionA (\(VLitteralA (Bool False)) -> VFonctionA (\(VLitteralA (Entier n1))-> VFonctionA (\(VLitteralA (Entier n2)) -> VLitteralA (Entier n2))))
+ifthenelseA = VFonctionA (\(VLitteralA (Bool b)) -> VFonctionA (\(VLitteralA (Entier n1)) -> VFonctionA (\(VLitteralA (Entier n2)) -> if b then 
+                                           (VLitteralA (Entier n1)) 
+                                         else (VLitteralA (Entier n2)))))
+
+
+
+interpreteB :: Environnement ValeurB -> Expression -> Maybe ValeurB
+
+
+data ValeurB = VLitteralB Litteral
+             | VFonctionB (ValeurB -> ErrValB)
+
+type MsgErreur = String
+type ErrValB   = Either MsgErreur ValeurB
+
+--Q21
+
+instance Show ValeurB where
+    show (VFonctionB _) = "λ"   
+    show (VLitteralB (Entier i)) = show i
+    show (VLitteralB (Bool b)) = show b
+	show (VLitteralB _) = "Application d'un litteral a quelque chose"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
