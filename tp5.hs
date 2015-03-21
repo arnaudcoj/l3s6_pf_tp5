@@ -87,7 +87,7 @@ exprParentheseeP = (car '(' >>= \_  ->
 --Q9
 
 isChiffre :: Char -> Bool
-isChiffre = flip elem ['1'..'9']
+isChiffre = flip elem ['0'..'9']
 
 nombreP :: Parser Expression
 nombreP = ( unOuPlus (carCond isChiffre) >>= \n ->
